@@ -1,27 +1,24 @@
 // ---------- Funções ----------
-function criaElemento (nome, quantidade) {
+function criaElemento (itemAtual) {
     const novoItem = document.createElement('li');
-    const negrito = document.createElement('strong');
-
-    negrito.textContent = quantidade;
-    novoItem.appendChild(negrito);
-    novoItem.innerHTML += nome;
     novoItem.classList.add('item');
+
+    const quantidadeItem = document.createElement('strong');
+    quantidadeItem.innerHTML = itemAtual.quantidade;
+    novoItem.appendChild(quantidadeItem);
+
+    novoItem.innerHTML += itemAtual.nome;
     listaItens.appendChild(novoItem);
-
-    let itemAtual = {
-        'nome': nome,
-        'quantidade': quantidade
-    };
-
-    listaLocalStorage.push(itemAtual);
-    localStorage.setItem('item', JSON.stringify(listaLocalStorage));
-}
+};
 
 // ---------- Lógica ----------
 const form = document.querySelector('#novo__item');
 const listaItens = document.querySelector('#lista');
-const listaLocalStorage = [];
+const listaLocalStorage =  JSON.parse(localStorage.getItem('itens')) || [];
+
+listaLocalStorage.forEach((elemento) => {
+    criaElemento(elemento);
+})
 
 form.addEventListener('submit', (evento) => {
     evento.preventDefault();
@@ -29,7 +26,15 @@ form.addEventListener('submit', (evento) => {
     let nome = evento.target.elements['nome'];
     let quantidade = evento.target.elements['quantidade'];
 
-    criaElemento(nome.value, quantidade.value);    
+    let itemAtual = {
+        'nome': nome.value,
+        'quantidade': quantidade.value
+    };
+    
+    criaElemento(itemAtual); 
+
+    listaLocalStorage.push(itemAtual);
+    localStorage.setItem('itens', JSON.stringify(listaLocalStorage));
     
     nome.value = "";
     quantidade.value = "";
