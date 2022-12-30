@@ -130,3 +130,9 @@ html {
     font-weight: 400;
 }
 
+/* Incluso com JS */
+
+.deletar {
+    opacity: 0;
+    transition: 500ms;
+}

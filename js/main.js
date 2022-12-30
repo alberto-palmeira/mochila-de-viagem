@@ -5,11 +5,40 @@ function criaElemento (itemAtual) {
 
     const quantidadeItem = document.createElement('strong');
     quantidadeItem.innerHTML = itemAtual.quantidade;
+    quantidadeItem.dataset.id = itemAtual.id
     novoItem.appendChild(quantidadeItem);
 
     novoItem.innerHTML += itemAtual.nome;
     listaItens.appendChild(novoItem);
+
+    novoItem.appendChild(deletaItem(quantidadeItem));
 };
+
+function atualizaElemento (itemAtual) {
+    let itemAtualizado = document.querySelector(`[data-id='${itemAtual.id}']`);
+    console.log(itemAtualizado);
+    itemAtualizado.innerHTML = itemAtual.quantidade;
+};
+
+function deletaItem (quantidadeItem) {
+    const elementoBotao = document.createElement('button');
+    elementoBotao.innerHTML = 'X';
+
+    elementoBotao.addEventListener('click', (evento) => {
+        const elementoPai = evento.target.parentNode;
+
+        if (listaLocalStorage.length === 1){
+            listaLocalStorage.length = 0;
+        } else if (listaLocalStorage.length > 1) {
+            listaLocalStorage.splice(quantidadeItem.dataset.id, 1);
+        }
+        
+        localStorage.setItem('itens', JSON.stringify(listaLocalStorage));
+        elementoPai.classList.add('deletar');
+    });
+
+    return elementoBotao;
+}
 
 // ---------- Lógica ----------
 const form = document.querySelector('#novo__item');
@@ -26,14 +55,28 @@ form.addEventListener('submit', (evento) => {
     let nome = evento.target.elements['nome'];
     let quantidade = evento.target.elements['quantidade'];
 
+    const existe = listaLocalStorage.find((elemento) => {
+        return elemento.nome === nome.value;
+    });
+
     let itemAtual = {
         'nome': nome.value,
         'quantidade': quantidade.value
     };
-    
-    criaElemento(itemAtual); 
 
-    listaLocalStorage.push(itemAtual);
+    if (existe) {
+        itemAtual.id = existe.id;
+
+        atualizaElemento(itemAtual, existe);
+        listaLocalStorage[existe.id] = itemAtual;
+    } else {
+        itemAtual.id = listaLocalStorage.length;
+
+
+        criaElemento(itemAtual); 
+        listaLocalStorage.push(itemAtual);
+    };
+
     localStorage.setItem('itens', JSON.stringify(listaLocalStorage));
     
     nome.value = "";
