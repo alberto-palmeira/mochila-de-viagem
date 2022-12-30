@@ -5,7 +5,7 @@ function criaElemento (itemAtual) {
 
     const quantidadeItem = document.createElement('strong');
     quantidadeItem.innerHTML = itemAtual.quantidade;
-    quantidadeItem.dataset.id = itemAtual.id
+    quantidadeItem.dataset.id = itemAtual.id;
     novoItem.appendChild(quantidadeItem);
 
     novoItem.innerHTML += itemAtual.nome;
@@ -26,15 +26,22 @@ function deletaItem (quantidadeItem) {
 
     elementoBotao.addEventListener('click', (evento) => {
         const elementoPai = evento.target.parentNode;
+        const elementoIrmao = evento.target.previousElementSibling;
+        const indiceElementoIrmao = listaLocalStorage.indexOf(elementoIrmao.id);
 
         if (listaLocalStorage.length === 1){
             listaLocalStorage.length = 0;
         } else if (listaLocalStorage.length > 1) {
-            listaLocalStorage.splice(quantidadeItem.dataset.id, 1);
+            listaLocalStorage.splice(indiceElementoIrmao, 1);
         }
         
         localStorage.setItem('itens', JSON.stringify(listaLocalStorage));
         elementoPai.classList.add('deletar');
+        
+        setTimeout(() => {
+            elementoPai.remove();
+        }, 500);
+        
     });
 
     return elementoBotao;
@@ -70,8 +77,7 @@ form.addEventListener('submit', (evento) => {
         atualizaElemento(itemAtual, existe);
         listaLocalStorage[existe.id] = itemAtual;
     } else {
-        itemAtual.id = listaLocalStorage.length;
-
+        itemAtual.id = nome.value;
 
         criaElemento(itemAtual); 
         listaLocalStorage.push(itemAtual);
