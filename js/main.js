@@ -1,4 +1,13 @@
 // ---------- Funções ----------
+function padronizaNome (nome) {
+    return nome.value[0].toUpperCase() + nome.value.slice(1).toLowerCase();
+};
+
+function criaId (nome) {
+    const novoId = nome.replace(/ /g,'-');
+    return novoId.toLowerCase();
+};
+
 function criaElemento (itemAtual) {
     const novoItem = document.createElement('li');
     novoItem.classList.add('item');
@@ -20,14 +29,14 @@ function atualizaElemento (itemAtual) {
     itemAtualizado.innerHTML = itemAtual.quantidade;
 };
 
-function deletaItem (quantidadeItem) {
+function deletaItem () {
     const elementoBotao = document.createElement('button');
     elementoBotao.innerHTML = 'X';
 
     elementoBotao.addEventListener('click', (evento) => {
         const elementoPai = evento.target.parentNode;
-        const elementoIrmao = evento.target.previousElementSibling;
-        const indiceElementoIrmao = listaLocalStorage.indexOf(elementoIrmao.id);
+        const elementoIrmao = evento.target.previousElementSibling.dataset.id;
+        const indiceElementoIrmao = listaLocalStorage.findIndex(elemento => elemento.id === elementoIrmao);
 
         if (listaLocalStorage.length === 1){
             listaLocalStorage.length = 0;
@@ -36,12 +45,11 @@ function deletaItem (quantidadeItem) {
         }
         
         localStorage.setItem('itens', JSON.stringify(listaLocalStorage));
-        elementoPai.classList.add('deletar');
         
+        elementoPai.classList.add('deletar');
         setTimeout(() => {
             elementoPai.remove();
         }, 500);
-        
     });
 
     return elementoBotao;
@@ -59,15 +67,15 @@ listaLocalStorage.forEach((elemento) => {
 form.addEventListener('submit', (evento) => {
     evento.preventDefault();
 
-    let nome = evento.target.elements['nome'];
+    let nome = padronizaNome(evento.target.elements['nome']);
     let quantidade = evento.target.elements['quantidade'];
 
     const existe = listaLocalStorage.find((elemento) => {
-        return elemento.nome === nome.value;
+        return elemento.nome === nome;
     });
 
     let itemAtual = {
-        'nome': nome.value,
+        'nome': nome,
         'quantidade': quantidade.value
     };
 
@@ -77,7 +85,7 @@ form.addEventListener('submit', (evento) => {
         atualizaElemento(itemAtual, existe);
         listaLocalStorage[existe.id] = itemAtual;
     } else {
-        itemAtual.id = nome.value;
+        itemAtual.id = criaId(nome);
 
         criaElemento(itemAtual); 
         listaLocalStorage.push(itemAtual);
